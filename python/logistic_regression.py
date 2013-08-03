@@ -6,6 +6,7 @@ from sklearn import linear_model
 import numpy as np
 import pandas as pd
 import random
+import sys
 
 def load_data(filename, chunksize=100000, iterator=True):
     '''
@@ -32,16 +33,19 @@ def write_submission(filename, prediction):
 def main(train='/vol/data/kaggle/abc/train.csv', test='/vol/data/kaggle/abc/test.csv', questions='/vol/data/kaggle/abc/questions.csv', submit='/vol/data/kaggle/abc/submissions/logit.csv'):
 
     print "Reading data"
-    
+    sys.stdout.flush()
+
     train_data = load_data(train)
     test_data = load_data(test)
     questions = pd.read_csv(questions)
 
     print "Finished reading data"
-    
+    sys.stdout.flush()
+
     outdata = np.zeros(len(questions.index))
     for i in questions.index:
         print "Working on question " + str(i)
+        sys.stdout.flush()
         model = linear_model.LogisticRegression()
         device_index = train_data['Device'] == questions['QuizDevice'][i]
         X_device = train_data[['X', 'Y', 'Z']][device_index]

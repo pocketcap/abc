@@ -1,31 +1,38 @@
-source("loadData.R")
 library(plyr)
+
+train <- read.csv("../data/train.csv")
+test <- read.csv("../data/test.csv")
+questions <- read.csv("../data/questions.csv")
+
 train <- ddply(train, .(Device), summarize,
-               x = mean(X), y = mean(Y), z = mean(Z))
+               x = mean(X),
+               y = mean(Y),
+               z = mean(Z))
 test <- ddply(test, .(SequenceId), summarize,
-              x = mean(X), y = mean(Y), z = mean(Z))
+              x = mean(X),
+              y = mean(Y),
+              z = mean(Z))
 
-
-outdata <- lapply(1:nrow(questions), function(i) {
+library(multicore)
+outdata <- mclapply(1:nrow(questions), function(i) {
     cat("Working on question", i, "\n")
     this.q <- questions[i,]
 
     this.test <- test[test$SequenceId == this.q$SequenceId, c("x", "y", "z")]
 
-    foo <- rbind(train[-1], this.test)
+    mat <- as.matrix(rbind(train[-1], this.test))
 
-    dist <- as.matrix(dist(as.matrix(foo)))
+    dist <- as.matrix(dist(mat))
+    dist <- dist[-nrow(dist), ncol(dist)]
+    names(dist) <- train$Device
 
-    this.dist <- dist[-nrow(dist),ncol(dist)]
-
-    1 - this.dist[which(train$Device == this.q$QuizDevice)] / sum(this.dist)
+    dist <- sort(dist)
+    which(names(dist) == this.q$QuizDevice)
 })
-
-save(outdata, file = "../data/submissions/dist.RData")
 
 outdata <- unlist(outdata)
 
 submit <- data.frame(QuestionId = questions$QuestionId,
                      IsTrue = outdata)
 
-write.csv(submit, file = "../data/submissions/dist.csv", row.names = FALSE)
+write.csv(submit, file = "../data/submissions/dist_sort.csv", row.names = FALSE)
