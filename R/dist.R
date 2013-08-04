@@ -26,7 +26,7 @@ outdata <- mclapply(1:nrow(questions), function(i) {
     dist <- dist[-nrow(dist), ncol(dist)]
     names(dist) <- train$Device
 
-    dist <- sort(dist)
+    dist <- sort(dist, decreasing = TRUE)
     which(names(dist) == this.q$QuizDevice)
 })
 
