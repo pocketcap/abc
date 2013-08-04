@@ -1,5 +1,9 @@
-source("loadData.R")
 library(plyr)
+
+train <- read.csv("../data/train.csv")
+test <- read.csv("../data/test.csv")
+questions <- read.csv("../data/questions.csv")
+
 train <- ddply(train, .(Device), summarize,
                x = mean(X), y = mean(Y), z = mean(Z))
 test <- ddply(test, .(SequenceId), summarize,

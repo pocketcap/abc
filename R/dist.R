@@ -20,7 +20,7 @@ outdata <- mclapply(1:nrow(questions), function(i) {
 
     this.test <- test[test$SequenceId == this.q$SequenceId, c("x", "y", "z")]
 
-    mat <- as.matrix(rbind(train[-1], this.test))
+    mat <- rbind(train[-1], this.test)
 
     dist <- as.matrix(dist(mat))
     dist <- dist[-nrow(dist), ncol(dist)]
