@@ -31,7 +31,7 @@ outdata <- lapply(devices, function(dev) {
                            QuizDevice = as.numeric(question),
                            answer = dev)
     
-    structure(list(sub[1:(nrow(sub) - N)],
+    structure(list(sub[1:(nrow(sub) - N),],
                    valid,
                    test,
                    question),
