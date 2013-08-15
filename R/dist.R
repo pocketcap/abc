@@ -1,17 +1,25 @@
 library(plyr)
+source("createFeatures.R")
 
-train <- read.csv("../data/train.csv")
-test <- read.csv("../data/test.csv")
+## train <- read.csv("../data/train.csv")
+## test <- read.csv("../data/test.csv")
+print(load("../data/train.RData"))
+print(load("../data/test.RData"))
 questions <- read.csv("../data/questions.csv")
 
+train <- ddply(train, .(Device), transform, T = diffMilliseconds(T), .progress = "text")
+
+train$T <- diffMilliseconds(train$T)
+test$T <- diffMilliseconds(test$T)
+
 train <- ddply(train, .(Device), summarize,
-               x = mean(X),
-               y = mean(Y),
-               z = mean(Z))
+               x = mean(X, trim = 0.01),
+               y = mean(Y, trim = 0.01),
+               z = mean(Z, trim = 0.01))
 test <- ddply(test, .(SequenceId), summarize,
-              x = mean(X),
-              y = mean(Y),
-              z = mean(Z))
+              x = mean(X, trim = 0.01),
+              y = mean(Y, trim = 0.01),
+              z = mean(Z, trim = 0.01))
 
 library(multicore)
 outdata <- mclapply(1:nrow(questions), function(i) {
